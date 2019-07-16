@@ -25,7 +25,7 @@ def monitor(directory, outfile=None, command=None):
             if outfile:
                 with open(outfile, "a+") as f:
                     f.write(directory + "/" +  y + "\n")
-            
+
             #update list of seen content
             contents.add(y)
 
@@ -33,12 +33,16 @@ def monitor(directory, outfile=None, command=None):
 
 
 # Perform shell actions on a given target
-def run_command(file, directory, command):
-    
-    obj_path = directory + "/" + file
-    command = command.replace("{x}", obj_path)
-    subprocess.run(command, shell=True)   
+def run_command(f, directory, command):
 
+    obj = directory + "/" + f
+    if "{x}" in command:
+        command = command.replace("{x}", obj)
+        subprocess.run(command, shell=True)
+    else:
+        command = command + " " + obj
+
+    subprocess.run(command, shell=True)
 
 # Persistently check for a certain file
 def target_monitor(directory, target, outfile=None, command=None):
@@ -67,7 +71,7 @@ def target_monitor(directory, target, outfile=None, command=None):
 def main():
 
     if args.target:
-        target_monitor(args.directory, args.target, 
+        target_monitor(args.directory, args.target,
                         outfile=args.outfile, command=args.exec)
     else:
         monitor(args.directory, outfile=args.outfile, command=args.exec)
